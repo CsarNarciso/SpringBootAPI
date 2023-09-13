@@ -40,6 +40,22 @@ public class Controller {
 	
 	
 	
+	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
+	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
+		
+		if ( book.getName().isBlank() || book.getGender().isBlank() ) {
+			
+			return ResponseEntity.badRequest().build();
+		}
+		
+		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class );
+		
+		return ResponseEntity.ok( book );
+	}
+
+	
+	
+	
 	
 	@Autowired
 	private Book_Repository bookRepo;
