@@ -1,6 +1,7 @@
 package com.cesar.BookApi.controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -22,6 +23,27 @@ import com.cesar.BookApi.repository.Book_Repository;
 @RequestMapping(value = "/books.api", produces = MediaType.APPLICATION_JSON_VALUE)
 public class Controller {
 
+	
+	
+	
+	@GetMapping("/books/{book_id}")
+	private ResponseEntity<?> getById(@PathVariable Long book_id){
+		
+		Optional<Book> bookEntity = bookRepo.findById(book_id);
+		
+		if ( bookEntity.isEmpty() ) {
+			
+			return ResponseEntity.noContent().build();
+		}
+		
+		Book_DTO book = modelMapper.map( bookEntity.get(), Book_DTO.class );
+		
+		return ResponseEntity.ok( book );
+	}
+	
+	
+	
+	
 	@GetMapping("/books/gender/{gender}")
 	private ResponseEntity<?> getByGender(@PathVariable String gender){
 		
