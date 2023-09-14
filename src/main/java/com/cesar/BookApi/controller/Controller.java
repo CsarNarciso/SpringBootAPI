@@ -27,13 +27,15 @@ public class Controller {
 	@GetMapping("/books/")
 	private ResponseEntity<?> getAll(){
 		
+		//Mapear list de entity books a dto
 		List<Book_DTO> books = bookRepo.findAll().stream()
 				.map( bookEntity -> modelMapper.map(bookEntity, Book_DTO.class) )
 				.collect(Collectors.toList());
 		
+		//Si no hay libros...
 		if ( books.isEmpty() ) {
 			
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.noContent().build(); 
 		}
 		
 		return ResponseEntity.ok( books );
@@ -46,13 +48,16 @@ public class Controller {
 	@GetMapping("/books/{book_id}")
 	private ResponseEntity<?> getById(@PathVariable Long book_id){
 		
+		//Obtener book entity por id
 		Optional<Book> bookEntity = bookRepo.findById(book_id);
 		
+		//Si el optional esta vacio..
 		if ( bookEntity.isEmpty() ) {
 			
 			return ResponseEntity.noContent().build();
 		}
 		
+		//Mapear entty a dto
 		Book_DTO book = modelMapper.map( bookEntity.get(), Book_DTO.class );
 		
 		return ResponseEntity.ok( book );
@@ -64,10 +69,12 @@ public class Controller {
 	@GetMapping("/gender/{gender}/books")
 	private ResponseEntity<?> getByGender(@PathVariable String gender){
 		
+		//Mapear list entity books a dto
 		List<Book_DTO> books = bookRepo.getAllByGender(gender).stream()
 				.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
 				.collect(Collectors.toList());
 		
+		//Si no hay libros de este genero..
 		if ( books.isEmpty() ) {
 			
 			return ResponseEntity.noContent().build();
@@ -82,12 +89,14 @@ public class Controller {
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
 	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
 		
+		//Si el book esta vacio..
 		if ( book.getName().isBlank() || book.getGender().isBlank() ) {
 			
 			return ResponseEntity.badRequest().build();
 		}
 		
-		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class );
+		//Mapear dto a entity para registrar en bbdd,
+		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //remapear a dto
 		
 		return ResponseEntity.ok( book );
 	}
