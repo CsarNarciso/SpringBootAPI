@@ -24,6 +24,23 @@ import com.cesar.BookApi.repository.Book_Repository;
 public class Controller {
 
 	
+	@GetMapping("/books/")
+	private ResponseEntity<?> getAll(){
+		
+		List<Book_DTO> books = bookRepo.findAll().stream()
+				.map( bookEntity -> modelMapper.map(bookEntity, Book_DTO.class) )
+				.collect(Collectors.toList());
+		
+		if ( books.isEmpty() ) {
+			
+			return ResponseEntity.noContent().build();
+		}
+		
+		return ResponseEntity.ok( books );
+		
+	}
+
+	
 	
 	
 	@GetMapping("/books/{book_id}")
@@ -44,11 +61,27 @@ public class Controller {
 	
 	
 	
+	@GetMapping("/genders/")
+	private ResponseEntity<?> getAllGenders(){
+		
+		List<String> genders = bookRepo.getAllGenders();
+		
+		if ( genders.isEmpty() ) {
+			
+			return ResponseEntity.noContent().build();
+		}
+		
+		return ResponseEntity.ok( genders );
+	}
+	
+	
+	
+	
 	@GetMapping("/books/gender/{gender}")
 	private ResponseEntity<?> getByGender(@PathVariable String gender){
 		
 		List<Book_DTO> books = bookRepo.getAllByGender(gender).stream()
-				.map(bookPost -> modelMapper.map(bookPost, Book_DTO.class))
+				.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
 				.collect(Collectors.toList());
 		
 		if ( books.isEmpty() ) {
