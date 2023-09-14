@@ -12,7 +12,4 @@ import com.cesar.BookApi.entity.Book;
 public interface Book_Repository extends JpaRepository<Book, Long>{
 
 	List<Book> getAllByGender(String gender);
-	
-	@Query( " SELECT b.gender FROM Book b GROUP BY b.gender " )
-	List<String> getAllGenders();
 }

@@ -61,23 +61,7 @@ public class Controller {
 	
 	
 	
-	@GetMapping("/genders/")
-	private ResponseEntity<?> getAllGenders(){
-		
-		List<String> genders = bookRepo.getAllGenders();
-		
-		if ( genders.isEmpty() ) {
-			
-			return ResponseEntity.noContent().build();
-		}
-		
-		return ResponseEntity.ok( genders );
-	}
-	
-	
-	
-	
-	@GetMapping("/books/gender/{gender}")
+	@GetMapping("/gender/{gender}/books")
 	private ResponseEntity<?> getByGender(@PathVariable String gender){
 		
 		List<Book_DTO> books = bookRepo.getAllByGender(gender).stream()
