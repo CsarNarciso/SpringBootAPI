@@ -92,14 +92,21 @@ public class Controller {
 	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
 		
 		//Si el book contiene data..
-		if ( book.getName().isBlank() || book.getGender().isBlank() ) {
+		if ( book.getName().isBlank() || book.getGenders().isEmpty() ) {
 			
-			//Y el genero es admitido
-			String gender = book.getGender();
+			//Verificar genders
+			List<String> bookGenders = book.getGenders();
+
+			boolean gendersAdmitidos = bookGenders.stream()
+					.allMatch( bG -> apiGenders.stream() 
+							.anyMatch( aG -> aG.equalsIgnoreCase( bG ) 
+									)
+							);
 			
-			if ( genders.stream().anyMatch( g -> g.equalsIgnoreCase( gender ))) {
+			//Y si son admitidos..
+			if ( gendersAdmitidos ) {
 					
-				//Mapear dto a entity para registrar en bbdd,
+				//Mapear book a entity para registrar en bbdd,
 				book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //y remapear a dto
 				
 				return ResponseEntity.ok( book );
@@ -118,7 +125,7 @@ public class Controller {
 	
 	//---------------INSTNACIAS-------------------
 	
-	private List<String> genders = Arrays.asList("Terror", "Ciencia-Ficion", "Fantasia"); //Generos admitidos por la Api
+	private List<String> apiGenders = Arrays.asList("Terror", "Ciencia-Ficion", "Fantasia"); //Generos admitidos por la Api
 	
 	@Autowired
 	private Book_Repository bookRepo;

@@ -1,5 +1,7 @@
 package com.cesar.BookApi.entity;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +17,7 @@ public class Book {
 	private Long id;
 
 	private String name;
-	private String gender;
+	private List<String> genders;
 
 	public Long getId() {
 		return id;
@@ -33,12 +35,11 @@ public class Book {
 		this.name = name;
 	}
 
-	public String getGender() {
-		return gender;
+	public List<String> getGenders() {
+		return genders;
 	}
 
-	public void setGender(String gender) {
-		this.gender = gender;
+	public void setGenders(List<String> genders) {
+		this.genders = genders;
 	}
-
 }

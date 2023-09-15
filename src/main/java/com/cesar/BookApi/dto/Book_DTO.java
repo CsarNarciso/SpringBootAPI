@@ -1,11 +1,13 @@
 package com.cesar.BookApi.dto;
 
+import java.util.List;
+
 public class Book_DTO {
 
 	private Long id;
 
 	private String name;
-	private String gender;
+	private List<String> genders;
 
 	public Long getId() {
 		return id;
@@ -23,11 +25,11 @@ public class Book_DTO {
 		this.name = name;
 	}
 
-	public String getGender() {
-		return gender;
+	public List<String> getGenders() {
+		return genders;
 	}
 
-	public void setGender(String gender) {
-		this.gender = gender;
+	public void setGenders(List<String> genders) {
+		this.genders = genders;
 	}
 }
