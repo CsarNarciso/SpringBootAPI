@@ -1,11 +1,9 @@
 package com.cesar.BookApi.controller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,11 +66,11 @@ public class Controller {
 	
 	
 	
-	@GetMapping("/gender/{gender}/books")
-	private ResponseEntity<?> getByGender(@PathVariable String gender){
+	@GetMapping("/genders/{genders}/books")
+	private ResponseEntity<?> getByGenders(@PathVariable List<String> genders){
 		
 		//Mapear list entity books a dto
-		List<Book_DTO> books = bookRepo.getAllByGender(gender).stream()
+		List<Book_DTO> books = bookRepo.getAllByGenders(genders).stream()
 				.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
 				.collect(Collectors.toList());
 		
