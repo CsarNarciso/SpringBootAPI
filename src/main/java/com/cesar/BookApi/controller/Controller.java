@@ -1,8 +1,11 @@
 package com.cesar.BookApi.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,19 +30,18 @@ public class Controller {
 	@GetMapping("/books/")
 	private ResponseEntity<?> getAll(){
 		
-		//Mapear list de entity books a dto
+		//Mapear list entity books a dto
 		List<Book_DTO> books = bookRepo.findAll().stream()
 				.map( bookEntity -> modelMapper.map(bookEntity, Book_DTO.class) )
 				.collect(Collectors.toList());
 		
-		//Si no hay libros...
-		if ( books.isEmpty() ) {
+		//Si hay libros...
+		if ( ! books.isEmpty() ) {
 			
-			return ResponseEntity.noContent().build(); 
+			return ResponseEntity.ok( books );
 		}
 		
-		return ResponseEntity.ok( books );
-		
+		return ResponseEntity.noContent().build(); 		
 	}
 
 	
@@ -48,19 +50,19 @@ public class Controller {
 	@GetMapping("/books/{book_id}")
 	private ResponseEntity<?> getById(@PathVariable Long book_id){
 		
-		//Obtener book entity por id
+		//Buscar book entity por id
 		Optional<Book> bookEntity = bookRepo.findById(book_id);
 		
-		//Si el optional esta vacio..
-		if ( bookEntity.isEmpty() ) {
+		//Si el libro existe..
+		if ( bookEntity.isPresent() ) {
 			
-			return ResponseEntity.noContent().build();
+			//Mapear entity a dto
+			Book_DTO book = modelMapper.map( bookEntity.get(), Book_DTO.class );
+			
+			return ResponseEntity.ok( book );
 		}
 		
-		//Mapear entty a dto
-		Book_DTO book = modelMapper.map( bookEntity.get(), Book_DTO.class );
-		
-		return ResponseEntity.ok( book );
+		return ResponseEntity.noContent().build();
 	}
 	
 	
@@ -74,13 +76,13 @@ public class Controller {
 				.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
 				.collect(Collectors.toList());
 		
-		//Si no hay libros de este genero..
-		if ( books.isEmpty() ) {
+		//Si hay libros de este genero..
+		if ( ! books.isEmpty() ) {
 			
-			return ResponseEntity.noContent().build();
+			return ResponseEntity.ok( books );
 		}
 		
-		return ResponseEntity.ok( books );
+		return ResponseEntity.noContent().build();
 	}
 	
 	
@@ -89,21 +91,34 @@ public class Controller {
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
 	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
 		
-		//Si el book esta vacio..
+		//Si el book contiene data..
 		if ( book.getName().isBlank() || book.getGender().isBlank() ) {
 			
-			return ResponseEntity.badRequest().build();
+			//Y el genero es admitido
+			String gender = book.getGender();
+			
+			if ( genders.stream().anyMatch( g -> g.equalsIgnoreCase( gender ))) {
+					
+				//Mapear dto a entity para registrar en bbdd,
+				book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //y remapear a dto
+				
+				return ResponseEntity.ok( book );
+			}
 		}
 		
-		//Mapear dto a entity para registrar en bbdd,
-		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //remapear a dto
-		
-		return ResponseEntity.ok( book );
+		return ResponseEntity.badRequest().build();
 	}
 
 	
 	
 	
+	
+	
+	
+	
+	//---------------INSTNACIAS-------------------
+	
+	private List<String> genders = Arrays.asList("Terror", "Ciencia-Ficion", "Fantasia"); //Generos admitidos por la Api
 	
 	@Autowired
 	private Book_Repository bookRepo;
