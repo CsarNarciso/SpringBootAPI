@@ -7,7 +7,7 @@ public class Book_DTO {
 	private Long id;
 
 	private String name;
-	private List<String> genders;
+	private List<String> genres;
 
 	public Long getId() {
 		return id;
@@ -25,11 +25,11 @@ public class Book_DTO {
 		this.name = name;
 	}
 
-	public List<String> getGenders() {
-		return genders;
+	public List<String> getGenres() {
+		return genres;
 	}
 
-	public void setGenders(List<String> genders) {
-		this.genders = genders;
+	public void setGenres(List<String> genres) {
+		this.genres = genres;
 	}
 }

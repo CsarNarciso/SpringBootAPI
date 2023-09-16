@@ -3,7 +3,6 @@ package com.cesar.BookApi.controller;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cesar.BookApi.dto.Book_DTO;
@@ -25,15 +25,15 @@ import com.cesar.BookApi.repository.Book_Repository;
 public class Controller {
 
 	
-	@GetMapping("/books/")
+	@GetMapping("/books")
 	private ResponseEntity<?> getAll(){
 		
-		//Mapear list entity books a dto
+		//Mapping list entity books to DTO
 		List<Book_DTO> books = bookRepo.findAll().stream()
 				.map( bookEntity -> modelMapper.map(bookEntity, Book_DTO.class) )
-				.collect(Collectors.toList());
+				.toList();
 		
-		//Si hay libros...
+		//If there's books...
 		if ( ! books.isEmpty() ) {
 			
 			return ResponseEntity.ok( books );
@@ -48,13 +48,13 @@ public class Controller {
 	@GetMapping("/books/{book_id}")
 	private ResponseEntity<?> getById(@PathVariable Long book_id){
 		
-		//Buscar book entity por id
+		//Searching book entity by id
 		Optional<Book> bookEntity = bookRepo.findById(book_id);
 		
-		//Si el libro existe..
+		//If book exist..
 		if ( bookEntity.isPresent() ) {
 			
-			//Mapear entity a dto
+			//Mapping entity to DTO
 			Book_DTO book = modelMapper.map( bookEntity.get(), Book_DTO.class );
 			
 			return ResponseEntity.ok( book );
@@ -66,15 +66,15 @@ public class Controller {
 	
 	
 	
-	@GetMapping("/genders/{genders}/books")
-	private ResponseEntity<?> getByGenders(@PathVariable List<String> genders){
+	@GetMapping("/books/by-genres")
+	private ResponseEntity<?> getByGenres(@RequestParam(name = "genres", required = true) List<String> genres){
 		
-		//Mapear list entity books a dto
-		List<Book_DTO> books = bookRepo.getAllByGenders(genders).stream()
-				.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
-				.collect(Collectors.toList());
+		//Mapping list entity books to DTO
+		List<Book_DTO> books = bookRepo.getAllByGenres( genres ).stream()
+				.map(bookEntity -> modelMapper.map( bookEntity, Book_DTO.class ))
+				.toList();
 		
-		//Si hay libros de este genero..
+		//if there's books of this genre..
 		if ( ! books.isEmpty() ) {
 			
 			return ResponseEntity.ok( books );
@@ -89,25 +89,28 @@ public class Controller {
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
 	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
 		
-		//Si el book contiene data..
-		if ( book.getName().isBlank() || book.getGenders().isEmpty() ) {
+		//If book contains data..
+		if ( book.getName() != null && book.getGenres() != null ) {
 			
-			//Verificar genders
-			List<String> bookGenders = book.getGenders();
-
-			boolean gendersAdmitidos = bookGenders.stream()
-					.allMatch( bG -> apiGenders.stream() 
-							.anyMatch( aG -> aG.equalsIgnoreCase( bG ) 
-									)
-							);
+			if ( ! book.getName().isBlank() && ! book.getGenres().isEmpty() ) {
 			
-			//Y si son admitidos..
-			if ( gendersAdmitidos ) {
-					
-				//Mapear book a entity para registrar en bbdd,
-				book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //y remapear a dto
+				//Verify genres
+				List<String> bookGenres = book.getGenres();
 				
-				return ResponseEntity.ok( book );
+				boolean supportedGenres = bookGenres.stream()
+						.allMatch( bG -> apiGenres.stream() 
+								.anyMatch( aG -> aG.equals( bG ) 
+										)
+								);
+			
+				//And if they are supported..
+				if ( supportedGenres ) {
+						
+					//Mapping book to entity to register in BBDD,
+					book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
+					
+					return ResponseEntity.ok( book );
+				}
 			}
 		}
 		
@@ -121,9 +124,9 @@ public class Controller {
 	
 	
 	
-	//---------------INSTNACIAS-------------------
+	//---------------INSTNANCES-------------------
 	
-	private List<String> apiGenders = Arrays.asList("Terror", "Ciencia-Ficion", "Fantasia"); //Generos admitidos por la Api
+	private List<String> apiGenres = Arrays.asList("horror", "science-fiction", "fantasy"); //Supported genres for Api
 	
 	@Autowired
 	private Book_Repository bookRepo;
