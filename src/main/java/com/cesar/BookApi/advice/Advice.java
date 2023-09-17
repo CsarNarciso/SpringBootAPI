@@ -1,4 +1,4 @@
-package com.cesar.BookApi.controller;
+package com.cesar.BookApi.advice;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingServletRequestParameterException;
