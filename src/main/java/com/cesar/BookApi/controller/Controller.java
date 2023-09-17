@@ -46,7 +46,7 @@ public class Controller {
 	
 	
 	@GetMapping("/books/{book_id}")
-	private ResponseEntity<?> getById(@PathVariable Long book_id){
+	private ResponseEntity<?> getById(@PathVariable Long book_id) {
 		
 		//Searching book entity by id
 		Optional<Book> bookEntity = bookRepo.findById(book_id);
@@ -61,23 +61,28 @@ public class Controller {
 		}
 		
 		return ResponseEntity.noContent().build();
+
 	}
 	
 	
 	
 	
 	@GetMapping("/books/by-genres")
-	private ResponseEntity<?> getByGenres(@RequestParam(name = "genres", required = true) List<String> genres){
+	private ResponseEntity<?> getByGenres(@RequestParam(name = "genres") List<String> genres){
 		
-		//Mapping list entity books to DTO
-		List<Book_DTO> books = bookRepo.getAllByGenres( genres ).stream()
-				.map(bookEntity -> modelMapper.map( bookEntity, Book_DTO.class ))
-				.toList();
-		
-		//if there's books of this genre..
-		if ( ! books.isEmpty() ) {
+		//If genres is not empty..
+		if ( ! genres.isEmpty() ) {			
 			
-			return ResponseEntity.ok( books );
+			//Mapping list entity books to DTO
+			List<Book_DTO> books = bookRepo.getAllByGenres( genres ).stream()
+					.map(bookEntity -> modelMapper.map( bookEntity, Book_DTO.class ))
+					.toList();
+			
+			//if there's books of this genre..
+			if ( ! books.isEmpty() ) {
+				
+				return ResponseEntity.ok( books );
+			}
 		}
 		
 		return ResponseEntity.noContent().build();
