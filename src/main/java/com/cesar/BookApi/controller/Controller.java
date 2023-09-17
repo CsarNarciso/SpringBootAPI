@@ -10,8 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -68,13 +66,13 @@ public class Controller {
 	
 	
 	@GetMapping("/books/by-genres")
-	private ResponseEntity<?> getByGenres(@RequestParam(name = "genres") List<String> genres){
+	private ResponseEntity<?> getByGenres(@RequestParam("genres") List<String> genres){
 		
 		//If genres is not empty..
 		if ( ! genres.isEmpty() ) {			
 			
 			//Mapping list entity books to DTO
-			List<Book_DTO> books = bookRepo.getAllByGenres( genres ).stream()
+			List<Book_DTO> books = bookRepo.getByGenres( genres ).stream()
 					.map(bookEntity -> modelMapper.map( bookEntity, Book_DTO.class ))
 					.toList();
 			
@@ -91,36 +89,36 @@ public class Controller {
 	
 	
 	
-	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
-	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
-		
-		//If book contains data..
-		if ( book.getName() != null && book.getGenres() != null ) {
-			
-			if ( ! book.getName().isBlank() && ! book.getGenres().isEmpty() ) {
-			
-				//Verify genres
-				List<String> bookGenres = book.getGenres();
-				
-				boolean supportedGenres = bookGenres.stream()
-						.allMatch( bG -> apiGenres.stream() 
-								.anyMatch( aG -> aG.equals( bG ) 
-										)
-								);
-			
-				//And if they are supported..
-				if ( supportedGenres ) {
-						
-					//Mapping book to entity to register in BBDD,
-					book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
-					
-					return ResponseEntity.ok( book );
-				}
-			}
-		}
-		
-		return ResponseEntity.badRequest().build();
-	}
+//	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
+//	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
+//		
+//		//If book contains data..
+//		if ( book.getName() != null && book.getGenres() != null ) {
+//			
+//			if ( ! book.getName().isBlank() && ! book.getGenres().isEmpty() ) {
+//			
+//				//Verify genres
+//				List<String> bookGenres = book.getGenres();
+//				
+//				boolean supportedGenres = bookGenres.stream()
+//						.allMatch( bG -> apiGenres.stream() 
+//								.anyMatch( aG -> aG.equals( bG ) 
+//										)
+//								);
+//			
+//				//And if they are supported..
+//				if ( supportedGenres ) {
+//						
+//					//Mapping book to entity to register in BBDD,
+//					book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
+//					
+//					return ResponseEntity.ok( book );
+//				}
+//			}
+//		}
+//		
+//		return ResponseEntity.badRequest().build();
+//	}
 
 	
 	

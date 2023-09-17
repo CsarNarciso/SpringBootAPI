@@ -11,6 +11,6 @@ import com.cesar.BookApi.entity.Book;
 @Service
 public interface Book_Repository extends JpaRepository<Book, Long>{
 
-	@Query( " SELECT b FROM Book b WHERE b.genres IN :genres " )
-	List<Book> getAllByGenres(List<String> genres);
+	@Query( " SELECT b FROM Book b WHERE b.genres = :genres " )
+	List<Book> getByGenres(List<String> genres);
 }
