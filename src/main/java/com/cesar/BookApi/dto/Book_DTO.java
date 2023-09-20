@@ -1,14 +1,18 @@
 package com.cesar.BookApi.dto;
 
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
 
 public class Book_DTO {
 
 	private Long id;
 
+	@NotBlank(message = "'name' is required.")
 	private String name;
-	private List<String> genres;
+	
+	@NotBlank(message = "'genre' is required.")
+	private String genre;
 
+	
 	public Long getId() {
 		return id;
 	}
@@ -25,11 +29,12 @@ public class Book_DTO {
 		this.name = name;
 	}
 
-	public List<String> getGenres() {
-		return genres;
+	public String getGenre() {
+		return genre;
 	}
 
-	public void setGenres(List<String> genres) {
-		this.genres = genres;
+	public void setGenre(String genre) {
+		this.genre = genre;
 	}
+
 }

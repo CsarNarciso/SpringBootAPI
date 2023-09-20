@@ -1,6 +1,5 @@
 package com.cesar.BookApi.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cesar.BookApi.dto.Book_DTO;
 import com.cesar.BookApi.entity.Book;
 import com.cesar.BookApi.repository.Book_Repository;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/books.api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,14 +68,14 @@ public class Controller {
 	
 	
 	
-	@GetMapping("/books/by-genres")
-	private ResponseEntity<?> getByGenres(@RequestParam("genres") List<String> genres){
+	@GetMapping("/books/by-genree")
+	private ResponseEntity<?> getByGenre(@RequestParam("genre") String genre){
 		
 		//If genres is not empty..
-		if ( ! genres.isEmpty() ) {			
+		if ( ! genre.isEmpty() ) {			
 			
 			//Mapping list entity books to DTO
-			List<Book_DTO> books = bookRepo.getByGenres( genres ).stream()
+			List<Book_DTO> books = bookRepo.getByGenre( genre ).stream()
 					.map(bookEntity -> modelMapper.map( bookEntity, Book_DTO.class ))
 					.toList();
 			
@@ -93,90 +93,28 @@ public class Controller {
 	
 	
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
-	private ResponseEntity<?> create(@RequestBody Book_DTO book) {
+	private ResponseEntity<?> create(@RequestBody @Valid Book_DTO book) {
 		
-		//If book contains data..
-		if ( noEmpty( book )) {
+		return null;
 		
-			//Set id in null
-			book.setId(null);
-			
-			//And if genres are supported..
-			if ( supportedGenres( book.getGenres() )) {
-					
-				//Mapping book to entity to register in BBDD,
-				book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
-				
-				return ResponseEntity.ok( book );
-			}
-			//No supported
-			return ResponseEntity.badRequest().body("Genres not supported.");
-		}
-		//Empty book
-		return ResponseEntity.badRequest().body("Body requires 'name' and 'genres' attributes. See api-documentation-url for more info.");
-	}
-	
-	
-	
-	
-//	@PutMapping("/books")
-//	public ResponseEntity<?> update(@RequestBody Book_DTO book){
-//		
-//		if( book.getId() != null ) {
+//			//Set id in null
+//			book.setId(null);
+//				
+//			//Mapping book to entity to register in BBDD,
+//			book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
 //			
-//			//Mapping book to entity to update in BBDD,
-//			book = modelMapper.map( bookRepo.save( modelMapper.map(book, Book.class) ), Book_DTO.class ); //and re-mapping to DTO 			
-//
-//			return ResponseEntity.ok(book);
-//		}
-//		
-//		return ResponseEntity.badRequest().build();
-//	}
-
-	
-	
-	
-	
-	
-	
-	
-	
-	//--------------METHODS---------------
-	
-	public boolean noEmpty(Book_DTO book) {
-	
-		//If book data is not null
-			if ( book.getName() != null && book.getGenres() != null ) {
-
-				//And not empty
-				if ( ! book.getName().isBlank() && ! book.getGenres().isEmpty() ) {
-				
-					return true;
-				}
-			}	
-		return false;
+//			return ResponseEntity.ok( book );
+			
+		//Empty book
+//		return ResponseEntity.badRequest().body("Body requires 'name' and 'genres' attributes. See api-documentation-url for more info.");
 	}
 	
-	
-	public boolean supportedGenres(List<String> genres) {
 		
-		//Verify genres
-		return genres.stream()
-				.allMatch( bG -> apiGenres.stream() 
-						.anyMatch( aG -> aG.equals( bG ) 
-							)
-					);
-	}
-	
-	
-	
 	
 	
 	
 	//---------------INSTNANCES-------------------
-	
-	private List<String> apiGenres = Arrays.asList("horror", "science-fiction", "fantasy"); //Supported genres for Api
-	
+
 	@Autowired
 	private Book_Repository bookRepo;
 	
