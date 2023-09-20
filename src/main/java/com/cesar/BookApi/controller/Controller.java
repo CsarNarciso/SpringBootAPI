@@ -95,18 +95,13 @@ public class Controller {
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
 	private ResponseEntity<?> create(@RequestBody @Valid Book_DTO book) {
 		
-		return null;
-		
-//			//Set id in null
-//			book.setId(null);
-//				
-//			//Mapping book to entity to register in BBDD,
-//			book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
-//			
-//			return ResponseEntity.ok( book );
+		//Set id in null
+		book.setId(null);
 			
-		//Empty book
-//		return ResponseEntity.badRequest().body("Body requires 'name' and 'genres' attributes. See api-documentation-url for more info.");
+		//Mapping DTO to entity to register in BBDD,
+		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
+		
+		return ResponseEntity.ok( book );
 	}
 	
 		

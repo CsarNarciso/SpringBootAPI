@@ -15,7 +15,7 @@ public class Book {
 	private Long id;
 
 	private String name;
-	private String genres;
+	private String genre;
 
 	
 	
@@ -36,13 +36,13 @@ public class Book {
 		this.name = name;
 	}
 
-	public String getGenres() {
-		return genres;
+	public String getGenre() {
+		return genre;
 	}
 
-	public void setGenres(String genres) {
-		this.genres = genres;
+	public void setGenre(String genre) {
+		this.genre = genre;
 	}
 
-
+	
 }
