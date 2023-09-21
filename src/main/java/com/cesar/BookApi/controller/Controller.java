@@ -1,13 +1,17 @@
 package com.cesar.BookApi.controller;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -125,7 +129,47 @@ public class Controller {
 		}
 		
 		return ResponseEntity.noContent().build();
-	}	
+	}
+	
+	
+	
+	
+	@PatchMapping( value = "/books/{book_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	private ResponseEntity<?> update(@PathVariable Long book_id, @RequestBody Map<String, Object> fields) {
+		
+		Optional<Book> optionalBook = bookRepo.findById(book_id);
+		
+		//if this book already exists..
+		if ( optionalBook.isPresent() ) {
+			
+			Book book = optionalBook.get();
+			
+			//Remove id to prevent change in entity.
+			fields.remove("id");
+			
+			//Set change fields to Entity
+			fields.forEach( (k, v) -> {
+				
+				Field field = ReflectionUtils.findField(Book.class, k);
+				
+				if ( field != null ) {
+									
+					field.setAccessible(true);
+					ReflectionUtils.setField(field, book, v);
+				}
+			});
+			
+			//Save change entity to update in BBDD,
+			Book_DTO updateBook = modelMapper.map( bookRepo.save( book ), Book_DTO.class ); //and mapping to DTO
+			
+			return ResponseEntity.ok( updateBook );
+		}
+		
+		return ResponseEntity.noContent().build();
+	}
+	
+	
+	
 	
 	
 	
