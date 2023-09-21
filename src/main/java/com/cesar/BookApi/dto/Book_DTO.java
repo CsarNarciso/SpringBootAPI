@@ -9,7 +9,6 @@ public class Book_DTO {
 	@NotBlank(message = "'name' is required.")
 	private String name;
 	
-	@NotBlank(message = "'genre' is required.")
 	private String genre;
 
 	
