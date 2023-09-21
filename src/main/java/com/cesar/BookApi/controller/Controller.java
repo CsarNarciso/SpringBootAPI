@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,7 +69,7 @@ public class Controller {
 	
 	
 	
-	@GetMapping("/books/by-genree")
+	@GetMapping("/books/by-genre")
 	private ResponseEntity<?> getByGenre(@RequestParam("genre") String genre){
 		
 		//If genres is not empty..
@@ -104,7 +105,27 @@ public class Controller {
 		return ResponseEntity.ok( book );
 	}
 	
+	
+	
+
+	
+	@PutMapping( value = "/books/{book_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	private ResponseEntity<?> replace(@PathVariable Long book_id, @RequestBody @Valid Book_DTO replaceBook) {
 		
+		//if this book already exists..
+		if ( bookRepo.findById(book_id).isPresent() ) {
+			
+			//Set id_book on update data to prevent replacing other book
+			replaceBook.setId(book_id);
+
+			//Mapping DTO to entity to replace in BBDD,
+			replaceBook = modelMapper.map( bookRepo.save( modelMapper.map( replaceBook, Book.class )), Book_DTO.class ); //and re-mapping to DTO
+			
+			return ResponseEntity.ok( replaceBook );
+		}
+		
+		return ResponseEntity.noContent().build();
+	}	
 	
 	
 	

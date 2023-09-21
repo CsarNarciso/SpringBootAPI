@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,12 +18,12 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 public class GlobalAdvice{
 
 	
-	@ExceptionHandler(NoHandlerFoundException.class)
+	@ExceptionHandler({NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	@ResponseBody()
-	public String handleNotFound(NoHandlerFoundException ex) {
+	public ResponseEntity<?> handleNotFound() {
 		
-		return "Path not found";
+		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Path not found");
 	}
 
 	
@@ -37,7 +38,7 @@ public class GlobalAdvice{
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<?> handleMessageNotReadable(HttpMessageNotReadableException ex){
 		
-		return ResponseEntity.badRequest().body("Not readable value.");
+		return ResponseEntity.badRequest().body("Not readable value in body.");
 	}
 	
 
