@@ -8,6 +8,7 @@ import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
@@ -112,7 +113,7 @@ public class Controller {
 		//Mapping DTO to entity to register in BBDD,
 		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
 		
-		return ResponseEntity.ok( book );
+		return ResponseEntity.status(HttpStatus.CREATED).body( book );
 	}
 	
 	
