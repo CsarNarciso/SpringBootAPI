@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -190,6 +191,23 @@ public class Controller {
 		return ResponseEntity.noContent().build();
 	}
 	
+	
+	
+	@DeleteMapping("/books/{book_id}")
+	public ResponseEntity<?> delete(@PathVariable Long book_id){
+		
+		Optional<Book> optionalBook = bookRepo.findById(book_id);
+		
+		//if this book already exists..
+		if ( optionalBook.isPresent() ) {
+					
+			bookRepo.deleteById(book_id);
+			
+			return ResponseEntity.ok().build();
+		}
+		
+		return ResponseEntity.noContent().build();	
+	}
 	
 	
 	
