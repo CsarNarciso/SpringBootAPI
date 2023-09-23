@@ -4,12 +4,13 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.ReflectionUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,11 @@ import com.cesar.BookApi.dto.Book_DTO;
 import com.cesar.BookApi.entity.Book;
 import com.cesar.BookApi.repository.Book_Repository;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 @RestController
 @RequestMapping(value = "/books.api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -134,7 +139,7 @@ public class Controller {
 	
 	
 	
-	@PatchMapping( value = "/books/{book_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PatchMapping( value = "/books/{book_id}", consumes = MediaType.APPLICATION_JSON_VALUE) 
 	private ResponseEntity<?> update(@PathVariable Long book_id, @RequestBody Map<String, Object> fields) {
 		
 		Optional<Book> optionalBook = bookRepo.findById(book_id);
@@ -144,8 +149,10 @@ public class Controller {
 			
 			Book book = optionalBook.get();
 			
+			
 			//Remove id to prevent change in entity.
 			fields.remove("id");
+			
 			
 			//Set change fields to Entity
 			fields.forEach( (k, v) -> {
@@ -158,9 +165,24 @@ public class Controller {
 					ReflectionUtils.setField(field, book, v);
 				}
 			});
+						
+			//Mapping to DTO to validate
+			Book_DTO dtoValidate = modelMapper.map( book, Book_DTO.class ); 
+
+			
+			//Validate
+			Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+			Set< ConstraintViolation<Book_DTO> > violations = validator.validate( dtoValidate );
+			
+			if ( ! violations.isEmpty() ) {
+				
+				throw new ConstraintViolationException(violations);
+			}
+			
 			
 			//Save change entity to update in BBDD,
-			Book_DTO updateBook = modelMapper.map( bookRepo.save( book ), Book_DTO.class ); //and mapping to DTO
+			Book_DTO updateBook = modelMapper.map( bookRepo.save( book ), Book_DTO.class ); //and re-mapping to DTO
+			
 			
 			return ResponseEntity.ok( updateBook );
 		}
@@ -180,4 +202,5 @@ public class Controller {
 	
 	@Autowired
 	private ModelMapper modelMapper;
+	
 }

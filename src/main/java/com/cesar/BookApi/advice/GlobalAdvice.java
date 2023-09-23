@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import jakarta.validation.ConstraintViolationException;
+
 @ControllerAdvice
 public class GlobalAdvice{
 
@@ -73,6 +75,18 @@ public class GlobalAdvice{
 	public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
 		
 		return ResponseEntity.badRequest().body( ex.getFieldError().getDefaultMessage() );	
+	}
+	
+	
+	
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex) {
+
+		StringBuilder message = new StringBuilder(); 
+		
+		ex.getConstraintViolations().stream().forEach( v -> message.append( v.getMessage() + " " ));
+		
+		return ResponseEntity.badRequest().body( message );	
 	}
 	
 }
