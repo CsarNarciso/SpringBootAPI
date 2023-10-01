@@ -194,14 +194,16 @@ public class Controller {
 	
 	
 	
+	
 	@DeleteMapping("/books/{book_id}")
 	public ResponseEntity<?> delete(@PathVariable Long book_id){
 		
 		Optional<Book> optionalBook = bookRepo.findById(book_id);
 		
-		//if this book already exists..
+		//if this book exists..
 		if ( optionalBook.isPresent() ) {
 					
+			//Delete from BBDD
 			bookRepo.deleteById(book_id);
 			
 			return ResponseEntity.ok().build();
