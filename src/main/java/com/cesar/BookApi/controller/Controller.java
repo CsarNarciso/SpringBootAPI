@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cesar.BookApi.dto.Book_DTO;
 import com.cesar.BookApi.entity.Book;
-import com.cesar.BookApi.repository.Book_Repository;
+import com.cesar.BookApi.service.BookService;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -42,16 +42,13 @@ public class Controller {
 	private ResponseEntity<?> getAll(){
 		
 		//Mapping list entity books to DTO
-		List<Book_DTO> books = bookRepo.findAll().stream()
-				.map( bookEntity -> modelMapper.map(bookEntity, Book_DTO.class) )
-				.toList();
+		List<Book_DTO> books = service.findAll();
 		
 		//If there's books...
 		if ( ! books.isEmpty() ) {
 			
 			return ResponseEntity.ok( books );
 		}
-		
 		return ResponseEntity.noContent().build(); 		
 	}
 
@@ -61,20 +58,14 @@ public class Controller {
 	@GetMapping("/books/{book_id}")
 	private ResponseEntity<?> getById(@PathVariable Long book_id) {
 		
-		//Searching book entity by id
-		Optional<Book> bookEntity = bookRepo.findById(book_id);
+		Book_DTO book = service.findById(book_id);
 		
 		//If book exist..
-		if ( bookEntity.isPresent() ) {
-			
-			//Mapping entity to DTO
-			Book_DTO book = modelMapper.map( bookEntity.get(), Book_DTO.class );
+		if ( book.isPresent() ) {
 			
 			return ResponseEntity.ok( book );
 		}
-		
 		return ResponseEntity.noContent().build();
-
 	}
 	
 	
@@ -83,21 +74,13 @@ public class Controller {
 	@GetMapping("/books/by-genre")
 	private ResponseEntity<?> getByGenre(@RequestParam("genre") String genre){
 		
-		//If genres is not empty..
-		if ( ! genre.isEmpty() ) {			
-			
-			//Mapping list entity books to DTO
-			List<Book_DTO> books = bookRepo.getByGenre( genre ).stream()
-					.map(bookEntity -> modelMapper.map( bookEntity, Book_DTO.class ))
-					.toList();
-			
-			//if there's books of this genre..
-			if ( ! books.isEmpty() ) {
-				
-				return ResponseEntity.ok( books );
-			}
-		}
+		List<Book_DTO> books = service.getByGenre(genre);
 		
+		//if there's books of this genre..
+		if ( ! books.isEmpty() ) {
+			
+			return ResponseEntity.ok( books );
+		}
 		return ResponseEntity.noContent().build();
 	}
 	
@@ -107,12 +90,7 @@ public class Controller {
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
 	private ResponseEntity<?> create(@RequestBody @Valid Book_DTO book) {
 		
-		//Set id in null
-		book.setId(null);
-			
-		//Mapping DTO to entity to register in BBDD,
-		book = modelMapper.map( bookRepo.save( modelMapper.map( book, Book.class )), Book_DTO.class ); //and re-mapping to DTO
-		
+		book = service.save(book); 
 		return ResponseEntity.status(HttpStatus.CREATED).body( book );
 	}
 	
@@ -124,17 +102,11 @@ public class Controller {
 	private ResponseEntity<?> replace(@PathVariable Long book_id, @RequestBody @Valid Book_DTO replaceBook) {
 		
 		//if this book already exists..
-		if ( bookRepo.findById(book_id).isPresent() ) {
-			
-			//Set id_book on update data to prevent replacing other book
-			replaceBook.setId(book_id);
-
-			//Mapping DTO to entity to replace in BBDD,
-			replaceBook = modelMapper.map( bookRepo.save( modelMapper.map( replaceBook, Book.class )), Book_DTO.class ); //and re-mapping to DTO
-			
+		if (service.findById(book_id) != null) {
+		
+			replaceBook = service.replace(book_id, replaceBook);
 			return ResponseEntity.ok( replaceBook );
 		}
-		
 		return ResponseEntity.noContent().build();
 	}
 	
@@ -144,51 +116,12 @@ public class Controller {
 	@PatchMapping( value = "/books/{book_id}", consumes = MediaType.APPLICATION_JSON_VALUE) 
 	private ResponseEntity<?> update(@PathVariable Long book_id, @RequestBody Map<String, Object> fields) {
 		
-		Optional<Book> optionalBook = bookRepo.findById(book_id);
-		
 		//if this book already exists..
-		if ( optionalBook.isPresent() ) {
-			
-			Book book = optionalBook.get();
-			
-			
-			//Remove id to prevent change in entity.
-			fields.remove("id");
-			
-			
-			//Set change fields to Entity
-			fields.forEach( (k, v) -> {
-				
-				Field field = ReflectionUtils.findField(Book.class, k);
-				
-				if ( field != null ) {
-									
-					field.setAccessible(true);
-					ReflectionUtils.setField(field, book, v);
-				}
-			});
-						
-			//Mapping to DTO to validate
-			Book_DTO dtoValidate = modelMapper.map( book, Book_DTO.class ); 
-
-			
-			//Validate
-			Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-			Set< ConstraintViolation<Book_DTO> > violations = validator.validate( dtoValidate );
-			
-			if ( ! violations.isEmpty() ) {
-				
-				throw new ConstraintViolationException(violations);
-			}
-			
-			
-			//Save change entity to update in BBDD,
-			Book_DTO updateBook = modelMapper.map( bookRepo.save( book ), Book_DTO.class ); //and re-mapping to DTO
-			
-			
-			return ResponseEntity.ok( updateBook );
-		}
+		if (service.findById(book_id) != null) {
 		
+			Book_DTO updatedBook = service.update(book_id, fields);
+			return ResponseEntity.ok(updatedBook);
+		}
 		return ResponseEntity.noContent().build();
 	}
 	
@@ -196,19 +129,17 @@ public class Controller {
 	
 	
 	@DeleteMapping("/books/{book_id}")
-	public ResponseEntity<?> delete(@PathVariable Long book_id){
+	public ResponseEntity<?> delete(@PathVariable Long book_id) {
 		
-		Optional<Book> optionalBook = bookRepo.findById(book_id);
+		Book_DTO book = service.findById(book_id);
 		
 		//if this book exists..
-		if ( optionalBook.isPresent() ) {
+		if (book != null) {
 					
-			//Delete from BBDD
-			bookRepo.deleteById(book_id);
-			
+			//Delete from DB
+			service.deleteById(book_id);
 			return ResponseEntity.ok().build();
 		}
-		
 		return ResponseEntity.noContent().build();	
 	}
 	
@@ -219,9 +150,8 @@ public class Controller {
 	//---------------INSTNANCES-------------------
 
 	@Autowired
-	private Book_Repository bookRepo;
+	private BookService service;
 	
 	@Autowired
 	private ModelMapper modelMapper;
-	
 }
