@@ -1,10 +1,10 @@
-package com.cesar.BookApi;
+package com.cesar.SpringBootAPI;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class BookApiApplicationTests {
+class SpringBootAPIApplicationTests {
 
 	@Test
 	void contextLoads() {
