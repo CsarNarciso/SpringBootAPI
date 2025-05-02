@@ -1,6 +1,7 @@
 package com.cesar.SpringBootAPI.service;
 
-import com.cesar.SpringBootAPI.dto.BookDTO;
+import com.cesar.SpringBootAPI.dto.BookResponseDTO;
+import com.cesar.SpringBootAPI.dto.BookRequestDTO;
 import com.cesar.SpringBootAPI.entity.Book;
 import com.cesar.SpringBootAPI.exception.NoContentException;
 import com.cesar.SpringBootAPI.exception.NotFoundException;
@@ -12,7 +13,6 @@ import jakarta.validation.Validator;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -21,7 +21,20 @@ import java.util.*;
 public class BookService {
 
 
-	public List<BookDTO> getAll() {
+	public BookResponseDTO create(BookRequestDTO createRequest) {
+
+		//Map create request DTO fields to entity object
+		Book entity = mapper.map(createRequest, Book.class);
+
+		//, to save in DB,
+		entity = repo.save(entity);
+
+		//Re-map saved entity to DTO as response
+		return mapper.map(entity, BookResponseDTO.class);
+	}
+
+
+	public List<BookResponseDTO> getAll() {
 
 		List<Book> books = repo.findAll();
 
@@ -31,12 +44,12 @@ public class BookService {
 
 		//Map entities to DTOs
 		return books.stream()
-				.map(entity -> mapper.map(entity, BookDTO.class))
+				.map(entity -> mapper.map(entity, BookResponseDTO.class))
 				.toList(); //and return as list
 	}
 
 
-	public BookDTO getById(Long id) {
+	public BookResponseDTO getById(Long id) {
 
 		Optional<Book> book = repo.findById(id);
 
@@ -45,11 +58,11 @@ public class BookService {
 		}
 
 		//Map entity as DTO response
-		return mapper.map(book.get(), BookDTO.class);
+		return mapper.map(book.get(), BookResponseDTO.class);
 	}
 
 
-	public List<BookDTO> getByGenre(String genre) {
+	public List<BookResponseDTO> getByGenre(String genre) {
 
 		List<Book> books = repo.getByGenre(genre);
 
@@ -59,25 +72,12 @@ public class BookService {
 
 		//Map entities to DTOs
 		return books.stream()
-				.map(entity -> mapper.map(entity, BookDTO.class))
+				.map(entity -> mapper.map(entity, BookResponseDTO.class))
 				.toList(); //and return as list
 	}
 
 
-	public BookDTO create(BookDTO createRequest) {
-
-		//Map create request DTO fields to entity object
-		Book entity = mapper.map(createRequest, Book.class);
-
-		//, to save in DB,
-		entity = repo.save(entity);
-
-		//Re-map saved entity to DTO as response
-		return mapper.map(entity, BookDTO.class);
-	}
-
-
-	public BookDTO replace(Long id, BookDTO newBookRequest) {
+	public BookResponseDTO replace(Long id, BookRequestDTO newBookRequest) {
 
 		if(repo.findById(id).isPresent()) {
 
@@ -89,13 +89,13 @@ public class BookService {
 			newBook = repo.save(newBook);
 
 			//And map back updated entity as DTO response
-			return mapper.map(newBook, BookDTO.class);
+			return mapper.map(newBook, BookResponseDTO.class);
 		}
 		throw  new NotFoundException();
 	}
 
 
-	public BookDTO update(Long id, Map<String, Object> fields) {
+	public BookResponseDTO update(Long id, Map<String, Object> fields) {
 
 		Optional<Book> existentBook = repo.findById(id);
 
@@ -121,11 +121,11 @@ public class BookService {
 		}
 
 		//Map to DTO to validate
-		BookDTO dtoValidate = mapper.map(updatedBook, BookDTO.class);
+		BookResponseDTO dtoValidate = mapper.map(updatedBook, BookResponseDTO.class);
 
 		//Validate
 		Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-		Set<ConstraintViolation<BookDTO>> violations = validator.validate(dtoValidate);
+		Set<ConstraintViolation<BookResponseDTO>> violations = validator.validate(dtoValidate);
 
 		if (!violations.isEmpty()) {
 			throw new ConstraintViolationException(violations);
@@ -135,7 +135,7 @@ public class BookService {
 		updatedBook = repo.save(updatedBook);
 
 		//and map back as DTO response
-		return mapper.map(updatedBook, BookDTO.class);
+		return mapper.map(updatedBook, BookResponseDTO.class);
 	}
 
 

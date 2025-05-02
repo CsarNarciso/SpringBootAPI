@@ -1,14 +1,12 @@
 package com.cesar.SpringBootAPI.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class BookDTO {
-
-	@NotBlank(message = "'name' is required.")
+public class BookResponseDTO {
+	private Long id;
 	private String name;
 	private String genre;
 }

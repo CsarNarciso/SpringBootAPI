@@ -2,6 +2,8 @@ package com.cesar.SpringBootAPI.controller;
 
 import java.util.List;
 import java.util.Map;
+
+import com.cesar.SpringBootAPI.dto.BookRequestDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cesar.SpringBootAPI.dto.BookDTO;
+import com.cesar.SpringBootAPI.dto.BookResponseDTO;
 import com.cesar.SpringBootAPI.service.BookService;
 
 import jakarta.validation.Valid;
@@ -23,10 +25,18 @@ import jakarta.validation.Valid;
 @RequestMapping("/books")
 public class Controller {
 
+
+	@PostMapping
+	private ResponseEntity<?> create(@RequestBody @Valid BookRequestDTO createRequest) {
+		BookResponseDTO createdBook = service.create(createRequest);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
+	}
+
+
 	@GetMapping
 	private ResponseEntity<?> getAll(){
 		
-		List<BookDTO> books = service.getAll();
+		List<BookResponseDTO> books = service.getAll();
 		return ResponseEntity.ok(books);
 	}
 
@@ -34,7 +44,7 @@ public class Controller {
 	@GetMapping("/{id}")
 	private ResponseEntity<?> getById(@PathVariable Long id) {
 		
-		BookDTO book = service.getById(id);
+		BookResponseDTO book = service.getById(id);
 		return ResponseEntity.ok(book);
 	}
 
@@ -42,22 +52,15 @@ public class Controller {
 	@GetMapping("/books/{genre}")
 	private ResponseEntity<?> getByGenre(@PathVariable String genre){
 		
-		List<BookDTO> books = service.getByGenre(genre);
+		List<BookResponseDTO> books = service.getByGenre(genre);
 		return ResponseEntity.ok(books);
 	}
 
 	
-	@PostMapping
-	private ResponseEntity<?> create(@RequestBody @Valid BookDTO createRequest) {
-		BookDTO createdBook = service.create(createRequest);
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
-	}
-
-	
 	@PutMapping("/{id}")
-	private ResponseEntity<?> replace(@PathVariable Long id, @RequestBody @Valid BookDTO newBookRequest) {
+	private ResponseEntity<?> replace(@PathVariable Long id, @RequestBody @Valid BookRequestDTO newBookRequest) {
 
-		BookDTO replacedBook = service.replace(id, newBookRequest);
+		BookResponseDTO replacedBook = service.replace(id, newBookRequest);
 		return ResponseEntity.ok(replacedBook);
 	}
 	
@@ -65,7 +68,7 @@ public class Controller {
 	@PatchMapping("/{id}")
 	private ResponseEntity<?> update(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
 		
-		BookDTO updatedBook = service.update(id, fields);
+		BookResponseDTO updatedBook = service.update(id, fields);
 		return ResponseEntity.ok(updatedBook);
 	}
 
