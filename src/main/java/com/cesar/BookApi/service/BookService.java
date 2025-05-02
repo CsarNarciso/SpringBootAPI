@@ -1,6 +1,6 @@
 package com.cesar.BookApi.service;
 
-import com.cesar.BookApi.dto.Book_DTO;
+import com.cesar.BookApi.dto.bookDTO;
 import com.cesar.BookApi.entity.Book;
 import com.cesar.BookApi.repository.Book_Repository;
 import jakarta.validation.ConstraintViolation;
@@ -18,16 +18,16 @@ import java.util.*;
 @Service
 public class BookService {
 
-	public List<Book_DTO> getAll() {
+	public List<bookDTO> getAll() {
 
 		//Mapping list entity books to DTO
 		return bookRepo.findAll().stream()
-				.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
+				.map(bookEntity -> modelMapper.map(bookEntity, bookDTO.class))
 				.toList();
 	}
 
 
-	public Book_DTO getById(Long book_id) {
+	public bookDTO getById(Long book_id) {
 
 		//Searching book entity by id
 		Optional<Book> bookEntity = bookRepo.findById(book_id);
@@ -36,53 +36,46 @@ public class BookService {
 		if (bookEntity.isPresent()) {
 
 			//Mapping entity to DTO
-			return modelMapper.map(bookEntity.get(), Book_DTO.class);
+			return modelMapper.map(bookEntity.get(), bookDTO.class);
 		}
 		return null;
 	}
 
 
-	public List<Book_DTO> getByGenre(String genre) {
+	public List<bookDTO> getByGenre(String genre) {
 
-		List<Book_DTO> books = Collections.emptyList();
+		List<bookDTO> books = Collections.emptyList();
 
 		if (!genre.isEmpty()) {
 
 			//Mapping list entity books to DTO
 			books = bookRepo.getByGenre(genre).stream()
-					.map(bookEntity -> modelMapper.map(bookEntity, Book_DTO.class))
+					.map(bookEntity -> modelMapper.map(bookEntity, bookDTO.class))
 					.toList();
 		}
 		return books;
 	}
 
 
-	public Book_DTO create(Book_DTO book) {
-
-		//Set id in null
-		book.setId(null);
+	public bookDTO create(bookDTO book) {
 
 		//Mapping DTO to entity to register in DB,
-		book = modelMapper.map(bookRepo.save(modelMapper.map(book, Book.class)), Book_DTO.class); //and re-mapping result to DTO
+		book = modelMapper.map(bookRepo.save(modelMapper.map(book, Book.class)), bookDTO.class); //and re-mapping result to DTO
 
 		return book;
 	}
 
 
-	public Book_DTO replace(Long book_id, Book_DTO replaceBook) {
-
-
-		//Set id_book on update data to prevent replacing other book
-		replaceBook.setId(book_id);
+	public bookDTO replace(Long book_id, bookDTO replaceBook) {
 
 		//Mapping DTO to entity to replace in DB,
-		replaceBook = modelMapper.map(bookRepo.save(modelMapper.map(replaceBook, Book.class)), Book_DTO.class); //and re-mapping to DTO
+		replaceBook = modelMapper.map(bookRepo.save(modelMapper.map(replaceBook, Book.class)), bookDTO.class); //and re-mapping to DTO
 
 		return replaceBook;
 	}
 
 
-	public Book_DTO update(Long book_id, Map<String, Object> fields) {
+	public bookDTO update(Long book_id, Map<String, Object> fields) {
 
 		Optional<Book> optionalBook = bookRepo.findById(book_id);
 
@@ -108,12 +101,12 @@ public class BookService {
 			});
 
 			//Mapping to DTO to validate
-			Book_DTO dtoValidate = modelMapper.map(book, Book_DTO.class);
+			bookDTO dtoValidate = modelMapper.map(book, bookDTO.class);
 
 
 			//Validate
 			Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
-			Set<ConstraintViolation<Book_DTO>> violations = validator.validate(dtoValidate);
+			Set<ConstraintViolation<bookDTO>> violations = validator.validate(dtoValidate);
 
 			if (!violations.isEmpty()) {
 
@@ -121,7 +114,7 @@ public class BookService {
 			}
 
 			//Save change entity to update in DB,
-			Book_DTO updateBook = modelMapper.map(bookRepo.save(book), Book_DTO.class); //and re-mapping to DTO
+			bookDTO updateBook = modelMapper.map(bookRepo.save(book), bookDTO.class); //and re-mapping to DTO
 
 			return updateBook;
 		}

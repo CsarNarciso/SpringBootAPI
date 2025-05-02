@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cesar.BookApi.dto.Book_DTO;
+import com.cesar.BookApi.dto.bookDTO;
 import com.cesar.BookApi.service.BookService;
 
 import jakarta.validation.Valid;
@@ -33,7 +33,7 @@ public class Controller {
 	private ResponseEntity<?> getAll(){
 		
 		//Mapping list entity books to DTO
-		List<Book_DTO> books = service.getAll();
+		List<bookDTO> books = service.getAll();
 		
 		//If there's books...
 		if ( ! books.isEmpty() ) {
@@ -49,7 +49,7 @@ public class Controller {
 	@GetMapping("/books/{book_id}")
 	private ResponseEntity<?> getById(@PathVariable Long book_id) {
 		
-		Book_DTO book = service.getById(book_id);
+		bookDTO book = service.getById(book_id);
 		
 		//If book exist..
 		if (book != null) {
@@ -64,7 +64,7 @@ public class Controller {
 	@GetMapping("/books/by-genre")
 	private ResponseEntity<?> getByGenre(@RequestParam("genre") String genre){
 		
-		List<Book_DTO> books = service.getByGenre(genre);
+		List<bookDTO> books = service.getByGenre(genre);
 		
 		//if there's books of this genre..
 		if ( ! books.isEmpty() ) {
@@ -78,7 +78,7 @@ public class Controller {
 	
 	
 	@PostMapping( value = "/books", consumes = MediaType.APPLICATION_JSON_VALUE)
-	private ResponseEntity<?> create(@RequestBody @Valid Book_DTO book) {
+	private ResponseEntity<?> create(@RequestBody @Valid bookDTO book) {
 		
 		book = service.create(book);
 		return ResponseEntity.status(HttpStatus.CREATED).body( book );
@@ -89,7 +89,7 @@ public class Controller {
 
 	
 	@PutMapping( value = "/books/{book_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-	private ResponseEntity<?> replace(@PathVariable Long book_id, @RequestBody @Valid Book_DTO replaceBook) {
+	private ResponseEntity<?> replace(@PathVariable Long book_id, @RequestBody @Valid bookDTO replaceBook) {
 		
 		//if this book already exists..
 		if (service.getById(book_id) != null) {
@@ -109,7 +109,7 @@ public class Controller {
 		//if this book already exists..
 		if (service.getById(book_id) != null) {
 		
-			Book_DTO updatedBook = service.update(book_id, fields);
+			bookDTO updatedBook = service.update(book_id, fields);
 			return ResponseEntity.ok(updatedBook);
 		}
 		return ResponseEntity.noContent().build();
@@ -121,7 +121,7 @@ public class Controller {
 	@DeleteMapping("/books/{book_id}")
 	public ResponseEntity<?> delete(@PathVariable Long book_id) {
 		
-		Book_DTO book = service.getById(book_id);
+		bookDTO book = service.getById(book_id);
 		
 		//if this book exists..
 		if (book != null) {
