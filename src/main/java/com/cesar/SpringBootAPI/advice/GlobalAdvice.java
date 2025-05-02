@@ -1,6 +1,7 @@
 package com.cesar.SpringBootAPI.advice;
 
 import com.cesar.SpringBootAPI.exception.NoContentException;
+import com.cesar.SpringBootAPI.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -10,8 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+git import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import jakarta.validation.ConstraintViolationException;
@@ -24,7 +24,7 @@ public class GlobalAdvice{
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
 
-	@ExceptionHandler({HttpClientErrorException.NotFound.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
+	@ExceptionHandler({NotFoundException.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
 	public ResponseEntity<?> handleNotFound() {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
 	}
