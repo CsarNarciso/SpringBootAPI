@@ -6,15 +6,7 @@ import java.util.Map;
 import com.cesar.SpringBootAPI.dto.BookRequestDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.cesar.SpringBootAPI.dto.BookResponseDTO;
 import com.cesar.SpringBootAPI.service.BookService;
@@ -25,13 +17,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/books")
 public class Controller {
 
-
 	@PostMapping
 	private ResponseEntity<?> create(@RequestBody @Valid BookRequestDTO createRequest) {
 		BookResponseDTO createdBook = service.create(createRequest);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdBook);
 	}
-
 
 	@GetMapping
 	private ResponseEntity<?> getAll(){
@@ -40,7 +30,6 @@ public class Controller {
 		return ResponseEntity.ok(books);
 	}
 
-	
 	@GetMapping("/{id}")
 	private ResponseEntity<?> getById(@PathVariable Long id) {
 		
@@ -48,10 +37,9 @@ public class Controller {
 		return ResponseEntity.ok(book);
 	}
 
-	
-	@GetMapping("/books/{genre}")
+	@GetMapping("/genre/{genre}")
 	private ResponseEntity<?> getByGenre(@PathVariable String genre){
-		
+
 		List<BookResponseDTO> books = service.getByGenre(genre);
 		return ResponseEntity.ok(books);
 	}

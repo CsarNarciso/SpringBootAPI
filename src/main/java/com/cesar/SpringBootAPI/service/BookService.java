@@ -20,7 +20,6 @@ import java.util.*;
 @Service
 public class BookService {
 
-
 	public BookResponseDTO create(BookRequestDTO createRequest) {
 
 		//Map create request DTO fields to entity object
@@ -32,7 +31,6 @@ public class BookService {
 		//Re-map saved entity to DTO as response
 		return mapper.map(entity, BookResponseDTO.class);
 	}
-
 
 	public List<BookResponseDTO> getAll() {
 
@@ -64,7 +62,7 @@ public class BookService {
 
 	public List<BookResponseDTO> getByGenre(String genre) {
 
-		List<Book> books = repo.getByGenre(genre);
+		List<Book> books = repo.findByGenre(genre);
 
 		if(books.isEmpty()){
 			throw  new NoContentException();

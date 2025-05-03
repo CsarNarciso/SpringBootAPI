@@ -51,7 +51,7 @@ public class GlobalAdvice{
 		Object value = ex.getValue();
 		String required = ex.getRequiredType().getSimpleName();
 		
-		String message = String.format("'%s' most being a type '%s' value for '%s'", value, required, parameter);
+		String message = String.format("'%s' must be a type '%s' value for '%s'", value, required, parameter);
 		
 		return ResponseEntity.badRequest().body( message );	
 	}
