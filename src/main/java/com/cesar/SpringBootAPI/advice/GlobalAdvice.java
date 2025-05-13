@@ -1,5 +1,6 @@
 package com.cesar.SpringBootAPI.advice;
 
+import com.cesar.SpringBootAPI.dto.ApplicationResponse;
 import com.cesar.SpringBootAPI.exception.NoContentException;
 import com.cesar.SpringBootAPI.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -21,59 +22,118 @@ public class GlobalAdvice{
 
 	@ExceptionHandler(NoContentException.class)
 	public ResponseEntity<?> handleNoContent() {
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+		HttpStatus httpStatus = HttpStatus.NO_CONTENT;
+		int httpCode = httpStatus.value();
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				"No content found for this resource",
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 
 	@ExceptionHandler({NotFoundException.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
 	public ResponseEntity<?> handleNotFound() {
-		return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
+
+		HttpStatus httpStatus = HttpStatus.NOT_FOUND;
+		int httpCode = httpStatus.value();
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				"Resource not found",
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 
 	
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<?> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex){
-		return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body("Media type not supported. Only supported JSON values.");
+
+		HttpStatus httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
+		int httpCode = httpStatus.value();
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				"Media type not supported. Only supported JSON values.",
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 	
 	
 	
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public ResponseEntity<?> handleMessageNotReadable(HttpMessageNotReadableException ex){
-		return ResponseEntity.badRequest().body("Not readable value in body.");
+
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		int httpCode = httpStatus.value();
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				"Not readable value in body.",
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 	
 
 	
 	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
 	public ResponseEntity<?> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
-		
+
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		int httpCode = httpStatus.value();
+
 		String parameter = ex.getName();
 		Object value = ex.getValue();
 		String required = ex.getRequiredType().getSimpleName();
-		
+
 		String message = String.format("'%s' must be a type '%s' value for '%s'", value, required, parameter);
-		
-		return ResponseEntity.badRequest().body( message );	
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				message,
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 	
 	
 	
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	public ResponseEntity<?> handleMissingRequestParameter(MissingServletRequestParameterException ex) {
-		
+
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		int httpCode = httpStatus.value();
+
 		String parameter = ex.getParameterName();
-		
 		String message = String.format("Parameter '%s' is required.", parameter);
-		
-		return ResponseEntity.badRequest().body( message );	
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				message,
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 	
 	
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<?> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
-		
-		return ResponseEntity.badRequest().body( ex.getFieldError().getDefaultMessage() );	
+
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		int httpCode = httpStatus.value();
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				ex.getFieldError().getDefaultMessage(),
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 	
 	
@@ -81,11 +141,20 @@ public class GlobalAdvice{
 	@ExceptionHandler(ConstraintViolationException.class)
 	public ResponseEntity<?> handleConstraintViolation(ConstraintViolationException ex) {
 
-		StringBuilder message = new StringBuilder(); 
-		
-		ex.getConstraintViolations().stream().forEach( v -> message.append( v.getMessage() + " " ));
-		
-		return ResponseEntity.badRequest().body( message );	
+		HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+		int httpCode = httpStatus.value();
+
+		StringBuilder message = new StringBuilder();
+		ex.getConstraintViolations().stream().forEach( v ->
+				message.append( v.getMessage() + " " )
+		);
+
+		ApplicationResponse<?> response = new ApplicationResponse<>(
+				httpCode,
+				message.toString(),
+				null);
+
+		return ResponseEntity.status(httpStatus).body(response);
 	}
 	
 }
