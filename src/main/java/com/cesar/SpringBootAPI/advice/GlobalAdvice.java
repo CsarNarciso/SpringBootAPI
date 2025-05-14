@@ -3,6 +3,7 @@ package com.cesar.SpringBootAPI.advice;
 import com.cesar.SpringBootAPI.dto.ApplicationResponse;
 import com.cesar.SpringBootAPI.exception.NoContentException;
 import com.cesar.SpringBootAPI.exception.NotFoundException;
+import com.cesar.SpringBootAPI.util.ApplicationResponseUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,43 +13,31 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import jakarta.validation.ConstraintViolationException;
 
+import java.util.Map;
+
 @ControllerAdvice
 public class GlobalAdvice{
 
 	@ExceptionHandler(NoContentException.class)
-	public ResponseEntity<?> handleNoContent() {
-
-		HttpStatus httpStatus = HttpStatus.NO_CONTENT;
-		int httpCode = httpStatus.value();
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(
-				httpCode,
-				"No content found for this resource",
-				null);
-
-		return ResponseEntity.status(httpStatus).body(response);
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public ApplicationResponse<Map<String, Object>> handleNoContent() {
+		return ApplicationResponseUtils.buildResponse(204, "No content found for this resource", null, null);
 	}
 
 	@ExceptionHandler({NotFoundException.class, NoHandlerFoundException.class, HttpRequestMethodNotSupportedException.class})
-	public ResponseEntity<?> handleNotFound() {
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	public ApplicationResponse<Map<String, Object>> handleNotFound() {
+		return ApplicationResponseUtils.buildResponse(404, "Resource not found", null, null);
 
-		HttpStatus httpStatus = HttpStatus.NOT_FOUND;
-		int httpCode = httpStatus.value();
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(
-				httpCode,
-				"Resource not found",
-				null);
-
-		return ResponseEntity.status(httpStatus).body(response);
 	}
 
-	
+
 	@ExceptionHandler(HttpMediaTypeNotSupportedException.class)
 	public ResponseEntity<?> handleMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex){
 

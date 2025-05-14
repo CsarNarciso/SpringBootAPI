@@ -1,13 +1,12 @@
 package com.cesar.SpringBootAPI.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.cesar.SpringBootAPI.dto.ApplicationResponse;
 import com.cesar.SpringBootAPI.dto.BookRequestDTO;
+import com.cesar.SpringBootAPI.util.ApplicationResponseUtils;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.cesar.SpringBootAPI.dto.BookResponseDTO;
@@ -17,110 +16,50 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/books")
-public class Controller {
+public class Controller<T> {
 
 	@PostMapping
-	private ResponseEntity<?> create(@RequestBody @Valid BookRequestDTO createRequest) {
-
+	@ResponseStatus(HttpStatus.CREATED)
+	private ApplicationResponse<Map<String, Object>> create(@RequestBody @Valid BookRequestDTO createRequest) {
 		BookResponseDTO createdBook = service.create(createRequest);
-
-		HttpStatus httpStatus = HttpStatus.CREATED;
-		int httpCode = httpStatus.value();
-
-		String message = "Book created successfully";
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("book", createdBook);
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(httpCode, message, data);
-		return ResponseEntity.status(httpStatus).body(response);
+		return ApplicationResponseUtils.buildResponse(201, "Book created successfully", "book", createdBook);
 	}
 
 	@GetMapping
-	private ResponseEntity<?> getAll(){
-		
+	@ResponseStatus(HttpStatus.OK)
+	private ApplicationResponse<Map<String, Object>> getAll(){
 		List<BookResponseDTO> books = service.getAll();
-
-		HttpStatus httpStatus = HttpStatus.OK;
-		int httpCode = httpStatus.value();
-
-		String message = "All existing books fetched";
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("books", books);
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(httpCode, message, data);
-		return ResponseEntity.status(httpStatus).body(response);
+		return ApplicationResponseUtils.buildResponse(200, "All existing books fetched", "books", books);
 	}
 
 	@GetMapping("/{id}")
-	private ResponseEntity<?> getById(@PathVariable Long id) {
-		
+	@ResponseStatus(HttpStatus.OK)
+	private ApplicationResponse<Map<String, Object>> getById(@PathVariable Long id) {
 		BookResponseDTO book = service.getById(id);
-
-		HttpStatus httpStatus = HttpStatus.OK;
-		int httpCode = httpStatus.value();
-
-		String message = String.format("Book %s fetched", id);
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("book", book);
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(httpCode, message, data);
-		return ResponseEntity.status(httpStatus).body(response);
+		return ApplicationResponseUtils.buildResponse(200, String.format("Book %s fetched", id), "book", book);
 	}
 
 	@GetMapping("/genre/{genre}")
-	private ResponseEntity<?> getByGenre(@PathVariable String genre){
-
+	@ResponseStatus(HttpStatus.OK)
+	private ApplicationResponse<Map<String, Object>> getByGenre(@PathVariable String genre){
 		List<BookResponseDTO> books = service.getByGenre(genre);
-
-		HttpStatus httpStatus = HttpStatus.OK;
-		int httpCode = httpStatus.value();
-
-		String message = String.format("All existing %s genre books fetched", genre);
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("books", books);
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(httpCode, message, data);
-		return ResponseEntity.status(httpStatus).body(response);
+		return ApplicationResponseUtils.buildResponse(200, String.format("All existing %s genre books fetched", genre), "books", books);
 	}
 
 	
 	@PutMapping("/{id}")
-	private ResponseEntity<?> replace(@PathVariable Long id, @RequestBody @Valid BookRequestDTO newBookRequest) {
-
+	@ResponseStatus(HttpStatus.OK)
+	private ApplicationResponse<Map<String, Object>> replace(@PathVariable Long id, @RequestBody @Valid BookRequestDTO newBookRequest) {
 		BookResponseDTO replacedBook = service.replace(id, newBookRequest);
-
-		HttpStatus httpStatus = HttpStatus.OK;
-		int httpCode = httpStatus.value();
-
-		String message = String.format("Book %s replaced successfully", id);
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("book", replacedBook);
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(httpCode, message, data);
-		return ResponseEntity.status(httpStatus).body(response);
+		return ApplicationResponseUtils.buildResponse(200, String.format("Book %s replaced successfully", id), "book", replacedBook);
 	}
 	
 	
 	@PatchMapping("/{id}")
-	private ResponseEntity<ApplicationResponse<?>> update(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
-		
+	@ResponseStatus(HttpStatus.OK)
+	private ApplicationResponse<Map<String, Object>> update(@PathVariable Long id, @RequestBody Map<String, Object> fields) {
 		BookResponseDTO updatedBook = service.update(id, fields);
-
-		HttpStatus httpStatus = HttpStatus.OK;
-		int httpCode = httpStatus.value();
-
-		String message = String.format("Book %s updated successfully", id);
-
-		Map<String, Object> data = new HashMap<>();
-		data.put("book", updatedBook);
-
-		ApplicationResponse<?> response = new ApplicationResponse<>(httpCode, message, data);
-		return ResponseEntity.status(httpStatus).body(response);
+		return ApplicationResponseUtils.buildResponse(200, String.format("Book %s updated successfully", id), "book", updatedBook);
 	}
 
 
@@ -128,6 +67,11 @@ public class Controller {
 	public void delete(@PathVariable Long id) {
 		service.delete(id);
 	}
+
+
+
+
+
 	
 	
 	
