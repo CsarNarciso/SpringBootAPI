@@ -34,7 +34,6 @@ public class GlobalAdvice{
 	@ResponseStatus(HttpStatus.NOT_FOUND)
 	public ApplicationResponse<Map<String, Object>> handleNotFound() {
 		return ApplicationResponseUtils.buildResponse(404, "Resource not found", null, null);
-
 	}
 
 
