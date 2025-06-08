@@ -148,5 +148,11 @@ But it could look like this too (bringing and enpoint to client to fetch more re
 
 ### And how can we achieve this?
 
-With a simple ```Map<String, Object>``` as the application response wrapper data field.
+With a simple ```Map<String, Object>``` as the application response wrapper data field. Example:
+```
+Map<String, Object> data = new HashMap<>();
+
+data.put("bestRatingEditorial", bestRatingEditorialDTO);
+data.put("worstRatingEditorial", worstRatingEditorialDTO);
+```
 
