@@ -106,25 +106,42 @@ But it could look like this too (bringing and enpoint to client to fetch more re
 ```
 {
   "code": 200,
-  "message": "Editorial 'editorial name' data and books fetched successfully",
+  "message": "Best and worst rating editorials data and books fetched successfully",
   "data": {
-    "editorial": {
+    "bestRatingEditorial": {
       "id": "1",
       "name": "The book editorial",
-      "location": "Somewhere"
+      "location": "Somewhere",
+      "books": [
+        {
+          "id": "34",
+          "name": "Dracula",
+          "genre": "horror"
+        },
+        {
+          "id": "181",
+          "name": "Java to the Moon!",
+          "genre": "Programming"
+        }
+      ]
     },
-    "books": [
-      {
-        "id": "34",
-        "name": "Dracula",
-        "genre": "horror"
-      },
-      {
-        "id": "181",
-        "name": "Java to the Moon!",
-        "genre": "Programming"
-      }
-    ]
+    "worstRatingEditorial": {
+      "id": "304",
+      "name": "A bad rating editorial",
+      "location": "Somewhere else",
+      "books": [
+        {
+          "id": "1",
+          "name": "The magic book!",
+          "genre": "Fantasy"
+        },
+        {
+          "id": "3",
+          "name": "Recipes",
+          "genre": "Cooking"
+        }
+      ]
+    },
   }
 }
 ```
