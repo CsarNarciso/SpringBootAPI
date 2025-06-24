@@ -29,8 +29,11 @@ I decided to follow this pattern since nowadays it is commonly used to communica
 
 
 ### Why include http code in the response wrapper if response entity already includes it?
-When communicating with clients, many of them preffer to access this info in your own application response data than in the http response attributes.
-Also, working with GraphQL, it's harder to read this info from the http response.
+
+"I have heard of a relatively good reason for including the HTTP status code in the response: some client side environments/frameworks does not give the client application code access to the HTTP status and thus, in order to cater for as many clients as possible, it may make sense to include the HTTP status code in the payload", 
+Jørn Wildt, (Nov, 19, 2013).
+
+So, it can be useful when you want to make you API public, but this is not a requiriment. Is just an option. You can check this discussion for more details: https://groups.google.com/g/api-craft/c/MhITjXlzwxY?pli=1
 
 
 ### Why I would include a message like "User created successfully" for create user endpoint if returning 201 code means the user was created?
